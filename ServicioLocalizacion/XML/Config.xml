@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+
+  <Conexion>
+    <!--Nombre de la Base de datos a cual vamos a integrar los documentos -->
+    <CompanyDB>DISTRILAPUNTA</CompanyDB>
+    <!--Dirreccion IP o Nombre del servidor SAP Business One-->
+    <Server>localhost</Server>
+    <!--Dirreccion IP o Nombre del servidor SAP Business One con el puerto 30000 -->
+    <LicenseServer>localhost:30000</LicenseServer>
+    <!--Dirreccion IP o Nombre del servidor SAP Business One con el puerto 40000 -->
+    <SLDServer>localhost:40000</SLDServer>
+    <!-- Usuario "sa" o "SYSTEM" del Motor de base de datos -->
+    <DbUserName>sa</DbUserName>
+    <!-- Password del usuario "sa" o "SYSTEM" del Motor de base de datos -->
+    <DbPassword>Asdf1234$</DbPassword>
+    <!-- Codigo de Usuario SAP Business One -->
+    <UserName>manager</UserName>
+    <!-- Password de Usuario SAP Business One -->
+    <Password>1234</Password>
+    <!-- Tipo de base de datos dst_MSSQL2014, dst_MSSQL2016, dst_HANADB, Solo se puede escoger uno  -->
+    <DbServerType>dst_MSSQL2016</DbServerType>
+  </Conexion>
+  
+  <PathLog>
+    <!-- Ruta donde se guardara el Log de Errores de la integración  -->
+    <PathFile>D:\OneDrive\04. Desarrollos Marlon\06. SDK_Training\SDK_Training\SDK_TrainingDIAPI\bin\Debug</PathFile>
+  </PathLog>
+
+  <Timer>
+    <!-- El tiempo de ejecución del servicio en Minutos -->
+    <Interval>120</Interval>
+  </Timer>
+
+  <Funcionalidades>
+    <!-- Buscar TRM en Superfinanciera y actualizar en SAP Business One SI/NO -->
+    <TRCM>
+      SI
+    </TRCM>
+    <!-- Buscar documentos pendientes y enviar a la DIAN SI/NO -->
+    <eBillingService>
+      NO
+    </eBillingService>
+    
+  </Funcionalidades>
+
+</Configuration>
