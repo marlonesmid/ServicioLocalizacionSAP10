@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Response" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Response" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-  <xs:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.Models.Response" />
-  <xs:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" />
+  <xs:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.Models.Response" />
+  <xs:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" />
   <xs:complexType name="DocumentResponse">
     <xs:sequence>
       <xs:element minOccurs="0" name="codigo" type="xs:int" />
       <xs:element minOccurs="0" name="consecutivoDocumento" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="cufe" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="esValidoDian" type="xs:boolean" />
+      <xs:element minOccurs="0" name="fechaAceptacionDIAN" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="fechaRespuesta" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="hash" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="mensaje" nillable="true" type="xs:string" />
@@ -26,6 +27,10 @@
   <xs:complexType name="DocumentStatusResponse">
     <xs:sequence>
       <xs:element minOccurs="0" name="aceptacionFisica" type="xs:boolean" />
+      <xs:element minOccurs="0" name="acuseComentario" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="acuseEstatus" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="acuseResponsable" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="acuseRespuesta" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="ambiente" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="cadenaCodigoQR" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="cadenaCufe" nillable="true" type="xs:string" />
@@ -38,6 +43,7 @@
       <xs:element minOccurs="0" name="esValidoDIAN" type="xs:boolean" />
       <xs:element minOccurs="0" name="estatusDocumento" type="xs:int" />
       <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/ServiceSoap.Models.Response" minOccurs="0" name="eventos" nillable="true" type="q4:ArrayOfEvento" />
+      <xs:element minOccurs="0" name="fechaAceptacionDIAN" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="fechaDocumento" nillable="true" type="xs:string" />
       <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" minOccurs="0" name="historialDeEntregas" nillable="true" type="q5:ArrayOfHistorialDeEntrega" />
       <xs:element minOccurs="0" name="mensaje" nillable="true" type="xs:string" />

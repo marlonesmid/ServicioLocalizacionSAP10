@@ -11,18 +11,68 @@ using System.IO;
 using Funciones;
 using System.Xml;
 using SAPbobsCOM;
+using System.Globalization;
 
 namespace BOTCRM
 {
     public class TCRM
     {
 
-        public void ActualizaTRMSAP()
+        public void ActualizaTRMSAP(SAPbobsCOM.Company _oCompany, string sPathLog)
         {
+            Funciones.Comunes DllFunciones = new Funciones.Comunes();
+
+            #region Variables y objetos
+
+            string sSearchTCRM = null;
+            
+            #endregion
+
+            #region Consulta si ya esta la TRM en SAP
+
+            SAPbobsCOM.Recordset oSearchTRM = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+            sSearchTCRM = DllFunciones.GetStringXMLDocument(_oCompany, "BOTCRMService", "TCRMService", "GetExchagueRate");
+
             string GetDateNow = DateTime.Now.ToString("yyyy-M-dd");
 
-            string ResponseXMLTRM =  ConsultaTRMSuperfinanciera(DateTime.Now.ToString());
+            sSearchTCRM = sSearchTCRM.Replace("%Date%", GetDateNow);
 
+            oSearchTRM.DoQuery(sSearchTCRM);
+
+            #endregion
+
+            #region Si no existe la TRM la actualiza  
+
+            if (oSearchTRM.RecordCount > 0)
+            {
+
+            }
+            else
+            {
+                string ResponseXMLTRM = ConsultaTRMSuperfinanciera(GetDateNow);
+
+                if (string.IsNullOrEmpty(ResponseXMLTRM))
+                {
+
+                }
+                else
+                {
+                    XmlDocument xmlResponseTRM = new XmlDocument();
+                    xmlResponseTRM.LoadXml(ResponseXMLTRM);
+
+                    var GetElementsByTagName = xmlResponseTRM.GetElementsByTagName("value")[0];
+                    var ChildNodes = GetElementsByTagName.ChildNodes[0];
+                    string ValorTRM = ChildNodes.Value;
+
+                    ValorTRM = ValorTRM.Replace(".",",");
+
+                    ActualizaTRMSAPBusinessOne(_oCompany, ValorTRM, sPathLog);
+                } 
+
+            }
+
+            #endregion
         }
 
         private string ConsultaTRMSuperfinanciera(string sGetDateNow)
@@ -92,12 +142,26 @@ namespace BOTCRM
 
         }
 
-        private void ActualizaTRMSAPBusinessOne(SAPbobsCOM.Company _oCompany)
+        private void ActualizaTRMSAPBusinessOne(SAPbobsCOM.Company _oCompany, string ValueTRM, string sPathLog)
         {
-            SAPbobsCOM.SBObob oExchagueRate =(SAPbobsCOM.SBObob)_oCompany.GetBusinessObject(BoObjectTypes.BoBridge);
+            Funciones.Comunes DllFunciones = new Funciones.Comunes();
 
-            //oExchagueRate.SetCurrencyRate("USD",)
-                
+
+            try
+            {
+                SAPbobsCOM.SBObob oExchagueRate = (SAPbobsCOM.SBObob)_oCompany.GetBusinessObject(BoObjectTypes.BoBridge);
+
+                oExchagueRate.SetCurrencyRate("USD", DateTime.Now, Convert.ToDouble(ValueTRM), true);
+                DllFunciones.Logger("TRM Actualizada correctamente en SAP Business One",sPathLog);
+
+            }
+            catch (Exception ex)
+            {
+
+                DllFunciones.Logger(ex.ToString(), sPathLog); 
+            }
+
+            
         }
 
     }

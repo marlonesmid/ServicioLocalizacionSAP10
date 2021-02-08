@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" />
-  <xs:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Response" />
+  <xs:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" />
+  <xs:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Response" />
   <xs:element name="Enviar">
     <xs:complexType>
       <xs:sequence>

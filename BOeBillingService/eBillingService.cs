@@ -897,6 +897,11 @@ namespace BOeBillingService
                     port.SendTimeout = TimeSpan.FromMinutes(2);
                     port.ReceiveTimeout = TimeSpan.FromMinutes(2);
 
+                    if (sModo == "PRO")
+                    {
+                        port.Security.Mode = BasicHttpSecurityMode.Transport;
+                    }
+
                     //Especifica la dirección de conexion para Emision y Adjuntos 
                     EndpointAddress endPointEmision = new EndpointAddress(sURLEmision); //URL DEMO EMISION
                     EndpointAddress endPointAdjuntos = new EndpointAddress(sURLAdjuntos); //URL DEMO ADJUNTOS          
@@ -1642,7 +1647,7 @@ namespace BOeBillingService
                     uploadAttachment.email = correoEntrega;
                     uploadAttachment.nombre = file.Name.Substring(0, file.Name.Length - 4);
                     uploadAttachment.formato = file.Extension.Substring(1);
-                    uploadAttachment.tipo = "2";
+                    uploadAttachment.tipo = "1";
 
                     if (Convert.ToString(oCabecera.Fields.Item("notificar").Value.ToString()) == "NO")
                     {
@@ -1980,7 +1985,7 @@ namespace BOeBillingService
 
         }
 
-        public void ActualizarEstadoDocumentos(SAPbobsCOM.Company oCompany, string sPathFileLog)
+        public void EnviarDocumentosDIANServicioLocalizacion(SAPbobsCOM.Company oCompany, string sPathFileLog)
         {
             Funciones.Comunes DllFunciones = new Funciones.Comunes();
 

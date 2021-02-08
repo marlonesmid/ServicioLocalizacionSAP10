@@ -39,7 +39,7 @@
   <ItemGroup>
     <Reference Include="BOConnection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\x86\BOConnection.dll</HintPath>
+      <HintPath>..\BOConnection\bin\x86\BOConnection.dll</HintPath>
     </Reference>
     <Reference Include="BOeBillingService">
       <HintPath>..\BOeBillingService\bin\x86\BOeBillingService.dll</HintPath>
@@ -47,6 +47,9 @@
     <Reference Include="BOFunciones, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\x86\BOFunciones.dll</HintPath>
+    </Reference>
+    <Reference Include="BOTCRMService">
+      <HintPath>..\BOTCRM\bin\x86\BOTCRMService.dll</HintPath>
     </Reference>
     <Reference Include="SAPBusinessOneSDK, Version=1.0.0.1, Culture=neutral, PublicKeyToken=c7c3cb60e45d119f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

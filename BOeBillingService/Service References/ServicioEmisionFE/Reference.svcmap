@@ -19,16 +19,16 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="https://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?wsdl" Protocol="http" SourceId="1" />
+    <MetadataSource Address="https://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?wsdl" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Service.xsd" MetadataType="Schema" ID="e1678a1b-ea37-4ee2-af7b-4be109c7f530" SourceId="1" SourceUrl="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd4" />
-    <MetadataFile FileName="Service1.xsd" MetadataType="Schema" ID="8226f6cf-c3c7-4f33-a4a1-239d904b08ae" SourceId="1" SourceUrl="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd5" />
-    <MetadataFile FileName="Service2.xsd" MetadataType="Schema" ID="c1813743-9152-4e7a-870b-a5df48c8c0ee" SourceId="1" SourceUrl="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd0" />
-    <MetadataFile FileName="Service3.xsd" MetadataType="Schema" ID="07e3d62b-47f2-41d9-9a82-697c45e7d3c4" SourceId="1" SourceUrl="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd1" />
-    <MetadataFile FileName="Service4.xsd" MetadataType="Schema" ID="64611fca-b4d4-4b37-b5f2-fc744a8ef68f" SourceId="1" SourceUrl="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd2" />
-    <MetadataFile FileName="Service5.xsd" MetadataType="Schema" ID="a428ff88-03b3-4fdc-879e-d58eac1482a9" SourceId="1" SourceUrl="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd3" />
-    <MetadataFile FileName="Service.wsdl" MetadataType="Wsdl" ID="8f748fae-c7a7-40a5-9c3e-090e1f4cd9ca" SourceId="1" SourceUrl="https://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?wsdl" />
+    <MetadataFile FileName="Service6.xsd" MetadataType="Schema" ID="e2059b5e-ad11-4769-9a1c-828babf7e796" SourceId="1" SourceUrl="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd2" />
+    <MetadataFile FileName="Service61.xsd" MetadataType="Schema" ID="d5b70f4c-a530-41bb-8c9e-6e0c73027875" SourceId="1" SourceUrl="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd4" />
+    <MetadataFile FileName="Service62.xsd" MetadataType="Schema" ID="486b6730-64b6-44b1-a320-455bbcb432df" SourceId="1" SourceUrl="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd1" />
+    <MetadataFile FileName="Service1.wsdl" MetadataType="Wsdl" ID="b27cbdbf-980d-4fc5-8b8c-2d4e0aad757b" SourceId="1" SourceUrl="https://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?wsdl" />
+    <MetadataFile FileName="Service63.xsd" MetadataType="Schema" ID="108bf48f-da4e-49bd-9580-9425b7e48252" SourceId="1" SourceUrl="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd3" />
+    <MetadataFile FileName="Service64.xsd" MetadataType="Schema" ID="bc2b4ebe-14bd-428c-81de-a4067b4a5f3d" SourceId="1" SourceUrl="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd5" />
+    <MetadataFile FileName="Service65.xsd" MetadataType="Schema" ID="278c7467-8548-45e5-8ed4-6b27c1076628" SourceId="1" SourceUrl="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd0" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

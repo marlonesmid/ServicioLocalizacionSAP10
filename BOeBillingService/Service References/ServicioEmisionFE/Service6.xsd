@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/v1.0/Service.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
   <xs:complexType name="FacturaGeneral">
     <xs:sequence>
       <xs:element minOccurs="0" name="anticipos" nillable="true" type="tns:ArrayOfAnticipos" />
@@ -554,6 +554,9 @@
   <xs:element name="ArrayOfHistorialDeEntrega" nillable="true" type="tns:ArrayOfHistorialDeEntrega" />
   <xs:complexType name="HistorialDeEntrega">
     <xs:sequence>
+      <xs:element minOccurs="0" name="LeidoEmailIPAddress" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LeidoEstatus" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LeidoFecha" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="canalDeEntrega" nillable="true" type="xs:string" />
       <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="email" nillable="true" type="q4:ArrayOfstring" />
       <xs:element minOccurs="0" name="entregaEstatus" nillable="true" type="xs:string" />

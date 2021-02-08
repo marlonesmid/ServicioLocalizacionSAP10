@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicioLocalizacion", "ServicioLocalizacion\ServicioLocalizacion.csproj", "{D40FEF10-B1DB-4A1E-B014-CD15F5943E72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BOTCRM", "BOTCRM\BOTCRM.csproj", "{9A02A6FB-CF4A-410A-BA3C-B4703CF38308}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BOTCRMService", "BOTCRM\BOTCRMService.csproj", "{9A02A6FB-CF4A-410A-BA3C-B4703CF38308}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BOConnection", "BOConnection\BOConnection.csproj", "{5FAA85B8-E584-42BC-9E20-7F7B155AD69C}"
 EndProject

@@ -27,11 +27,11 @@
   </wsp:Policy>
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
-      <xsd:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd0" namespace="http://tempuri.org/" />
-      <xsd:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
-      <xsd:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" />
-      <xsd:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-      <xsd:import schemaLocation="http://emision21.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Response" />
+      <xsd:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Models.Object" />
+      <xsd:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://emision21v2.thefactoryhka.com.co/ws/adjuntos/Service.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/ServiceSoap.UBL2._0.Response" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="IService_CargarAdjuntos_InputMessage">
@@ -73,10 +73,10 @@
   </wsdl:binding>
   <wsdl:service name="Service">
     <wsdl:port name="BasicHttpBinding_IService" binding="tns:BasicHttpBinding_IService">
-      <soap:address location="http://emision21.thefactoryhka.com.co/ws/adjuntos/Service.svc" />
+      <soap:address location="http://emision21v2.thefactoryhka.com.co/ws/adjuntos/Service.svc" />
     </wsdl:port>
     <wsdl:port name="BasicHttpsBinding_IService" binding="tns:BasicHttpsBinding_IService">
-      <soap:address location="https://emision21.thefactoryhka.com.co/ws/adjuntos/Service.svc" />
+      <soap:address location="https://emision21v2.thefactoryhka.com.co/ws/adjuntos/Service.svc" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

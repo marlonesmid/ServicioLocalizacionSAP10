@@ -17,7 +17,7 @@ namespace BOConnection
 
         Funciones.Comunes DllFunciones = new Funciones.Comunes();
 
-        public SAPbobsCOM.Company SetApplication()
+        public SAPbobsCOM.Company SetApplication(string DataBase)
         {
             #region Varibles y Objetos
 
@@ -33,28 +33,28 @@ namespace BOConnection
 
             #region Parametros de conexion
 
-            oCompany.CompanyDB = xmlConfig.SelectSingleNode("Configuration/Conexion/CompanyDB").InnerText;
-            oCompany.Server = xmlConfig.SelectSingleNode("Configuration/Conexion/Server").InnerText;
-            oCompany.LicenseServer = xmlConfig.SelectSingleNode("Configuration/Conexion/LicenseServer").InnerText;
-            oCompany.SLDServer = xmlConfig.SelectSingleNode("Configuration/Conexion/SLDServer").InnerText;
-            oCompany.DbUserName = xmlConfig.SelectSingleNode("Configuration/Conexion/DbUserName").InnerText;
-            oCompany.DbPassword = xmlConfig.SelectSingleNode("Configuration/Conexion/DbPassword").InnerText;
-            oCompany.UserName = xmlConfig.SelectSingleNode("Configuration/Conexion/UserName").InnerText;
-            oCompany.Password = xmlConfig.SelectSingleNode("Configuration/Conexion/Password").InnerText;
+            oCompany.CompanyDB = DataBase   ;
+            oCompany.Server = xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/Server").InnerText;
+            oCompany.LicenseServer = xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/LicenseServer").InnerText;
+            oCompany.SLDServer = xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/SLDServer").InnerText;
+            oCompany.DbUserName = xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/DbUserName").InnerText;
+            oCompany.DbPassword = xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/DbPassword").InnerText;
+            oCompany.UserName = xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/UserName").InnerText;
+            oCompany.Password = xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/Password").InnerText;
 
-            if (xmlConfig.SelectSingleNode("Configuration/Conexion/DbServerType").InnerText == "dst_MSSQL2014")
+            if (xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/DbServerType").InnerText == "dst_MSSQL2014")
             {
                 oCompany.DbServerType = SAPbobsCOM.BoDataServerTypes.dst_MSSQL2014;
             }
-            else if (xmlConfig.SelectSingleNode("Configuration/Conexion/DbServerType").InnerText == "dst_MSSQL2016")
+            else if (xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/DbServerType").InnerText == "dst_MSSQL2016")
             {
                 oCompany.DbServerType = SAPbobsCOM.BoDataServerTypes.dst_MSSQL2016;
             }
-            else if (xmlConfig.SelectSingleNode("Configuration/Conexion/DbServerType").InnerText == "dst_MSSQL2017")
+            else if (xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/DbServerType").InnerText == "dst_MSSQL2017")
             {
                 oCompany.DbServerType = SAPbobsCOM.BoDataServerTypes.dst_MSSQL2017;
             }
-            else if (xmlConfig.SelectSingleNode("Configuration/Conexion/DbServerType").InnerText == "dst_HANADB")
+            else if (xmlConfig.SelectSingleNode("Configuration/DataBases/Conexion/DbServerType").InnerText == "dst_HANADB")
             {
                 oCompany.DbServerType = SAPbobsCOM.BoDataServerTypes.dst_HANADB;
             }
