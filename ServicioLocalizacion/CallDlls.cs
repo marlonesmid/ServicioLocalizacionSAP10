@@ -95,7 +95,7 @@ namespace ServicioLocalizacion
 
                 #region Valida que funcionalidades estan activas
 
-                string sTCRM = xmlQuerys.SelectSingleNode("Configuration/Funcionalidades/TRCM").InnerText;
+                string sTCRM = xmlQuerys.SelectSingleNode("Configuration/Funcionalidades/TRCM/Activo").InnerText;
                 sTCRM = sTCRM.Trim();
 
                 string seBillingService = xmlQuerys.SelectSingleNode("Configuration/Funcionalidades/eBillingService").InnerText;
@@ -175,8 +175,10 @@ namespace ServicioLocalizacion
                         if (oCompany.Connected == true)
                         {
                             DllFunciones.Logger("Buscando documentos para enviar a la DIAN ", PathFileLog);
-
                             DlleBillingService.EnviarDocumentosDIANServicioLocalizacion(oCompany, PathFileLog);
+
+                            DllFunciones.Logger("Buscando correos a sincronizar", PathFileLog);
+                            DlleBillingService.UpdateEmailSendInSAP(oCompany, PathFileLog);
 
                             oCompany.Disconnect();
 

@@ -1686,6 +1686,134 @@ namespace BOeBillingService
 
         }
 
+        public void UpdateEmailSendInSAP(SAPbobsCOM.Company _oCompany, string sPathFileLog)
+        {
+            Funciones.Comunes DllFunciones = new Funciones.Comunes();
+
+            try
+            {
+                #region Consulta URL
+                
+                string sGetModo = null;
+                string sURLEmision = null;
+                string sURLAdjuntos = null;
+                string sModo = null;
+                string sllave = null;
+                string sPass = null;
+
+                SAPbobsCOM.Recordset oConsultarGetModo = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                sGetModo = DllFunciones.GetStringXMLDocument(_oCompany, "BOeBillingService", "eBilling", "GetModoandURL");
+
+                sGetModo = sGetModo.Replace("%Estado%", "\"U_BO_Status\" = 'Y'").Replace("%DocEntry%", " ");
+
+                oConsultarGetModo.DoQuery(sGetModo);
+
+                sURLEmision = Convert.ToString(oConsultarGetModo.Fields.Item("URLTFHKA").Value.ToString()) + "/ws/v1.0/Service.svc?wsdl";
+                sURLAdjuntos = Convert.ToString(oConsultarGetModo.Fields.Item("URLTFHKA").Value.ToString()) + "/ws/adjuntos/Service.svc?wsdl";
+                sModo = Convert.ToString(oConsultarGetModo.Fields.Item("Modo").Value.ToString());
+                sllave = Convert.ToString(oConsultarGetModo.Fields.Item("Llave").Value.ToString());
+                sPass = Convert.ToString(oConsultarGetModo.Fields.Item("Password").Value.ToString());
+
+                DllFunciones.liberarObjetos(oConsultarGetModo);
+                                    
+                #endregion
+                    
+                #region Instanciacion parametros TFHKA
+
+                    
+                //Especifica el puerto (HTTP o HTTPS)
+                    if (sModo == "PRU")
+                    {
+                        BasicHttpBinding port = new BasicHttpBinding();
+                    }
+                    else if (sModo == "PRO")
+                    {
+                        BasicHttpsBinding port = new BasicHttpsBinding();
+                    }
+
+                    port.MaxBufferPoolSize = Int32.MaxValue;
+                    port.MaxBufferSize = Int32.MaxValue;
+                    port.MaxReceivedMessageSize = Int32.MaxValue;
+                    port.ReaderQuotas.MaxStringContentLength = Int32.MaxValue;
+                    port.SendTimeout = TimeSpan.FromMinutes(2);
+                    port.ReceiveTimeout = TimeSpan.FromMinutes(2);
+
+                    if (sModo == "PRO")
+                    {
+                        port.Security.Mode = BasicHttpSecurityMode.Transport;
+                    }
+
+                    //Especifica la dirección de conexion para Emision y Adjuntos 
+                    EndpointAddress endPointEmision = new EndpointAddress(sURLEmision); //URL DEMO EMISION
+                    EndpointAddress endPointAdjuntos = new EndpointAddress(sURLAdjuntos); //URL DEMO ADJUNTOS          
+
+                #endregion
+
+                #region Variables y Objetos 
+                
+                SAPbobsCOM.Recordset oGetDocs = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+                
+                string sGetDocs = DllFunciones.GetStringXMLDocument(_oCompany, "BOeBillingService", "eBilling", "GetEmailNotSend");
+                
+                sGetDocs = sGetDocs.Replace("%Table%","OINV");
+                
+                oGetDocs.DoQuery(sGetDocs);
+
+                #endregion
+
+                #region Lista documentos a consultar en el proveedor tecnologico  
+                
+                int iDocumentosaconsultar = oGetDocs.RecordCount;
+
+                serviceClient = new ServicioEmisionFE.ServiceClient(port, endPointEmision);
+                DocumentStatusResponse resp = new BOeBillingService.ServicioEmisionFE.DocumentStatusResponse();
+                
+                if (iDocumentosaconsultar > 0)
+                {
+                    oGetDocs.MoveFirst();
+
+                    do
+                    {
+                        string sDocPrefijo = null;
+                        sDocPrefijo = Convert.ToString(oGetDocs.Fields.Item("DocPref").Value.ToString());
+                      
+                        resp = serviceClient.EstadoDocumento(sllave, sPass, sDocPrefijo );
+
+                        if (resp.codigo == 200)
+                        {
+                            InsertSendEmail(_oCompany, oGetDocs, resp, sPathFileLog);
+                            DllFunciones.Logger("Documento No."+sDocPrefijo+" sincronizado",sPathFileLog);
+                        }
+
+                        oGetDocs.MoveNext();
+
+                        } while (oGetDocs.EoF == false);
+
+                    DllFunciones.Logger("Sincronizacion finalizada", sPathFileLog);
+                }
+                else
+                {
+                    DllFunciones.Logger("No se encontraron correos a sincronizar",sPathFileLog);
+                }
+
+                #region Liberacion de Objetos
+
+                DllFunciones.liberarObjetos(oGetDocs);
+
+                #endregion
+
+                #endregion
+
+            }
+            catch (Exception ex)
+            {
+
+                DllFunciones.Logger(ex.ToString(), sPathFileLog);
+            }
+
+        }
+
         private void UpdateoInvoice(SAPbobsCOM.Company __oCompany, string _sQueryDocEntryInvoice, int _CRWS, string _MRWS, string _WSCUFE, string _WSQR, string _RutaPDF, string _RutaXML, string sPathFileLog)
         {
             Funciones.Comunes DllFunciones = new Funciones.Comunes();
@@ -2043,6 +2171,9 @@ namespace BOeBillingService
                             sDocEntry = null;
                             sDocEntry = Convert.ToString(oRsInvoice.Fields.Item("DocEntry").Value.ToString());
                             EnviarDocumentosMasivamenteTFHKA(oCompany, "FacturaDeClientes", "S", sDocEntry, sPathFileLog);
+
+                            
+
                             oRsInvoice.MoveNext();
 
                         } while (oRsInvoice.EoF == false);
@@ -2095,148 +2226,166 @@ namespace BOeBillingService
             catch (Exception e)
             {
                 DllFunciones.Logger(e.ToString(), sPathFileLog);
-
-                throw;
             }
 
 
         }
 
-        public void InsertSendEmail(SAPbobsCOM.Company _oCompany, SAPbobsCOM.Recordset _oCabecera, string _sCountsEmails, string _sDocEntry, string _sObjecType)
+        public void InsertSendEmail(SAPbobsCOM.Company _oCompany, SAPbobsCOM.Recordset oDocs, BOeBillingService.ServicioEmisionFE.DocumentStatusResponse sRespuesta, string sPathFileLog)
         {
             Funciones.Comunes DllFunciones = new Funciones.Comunes();
             try
             {
+                #region Variables y objetos
 
-                if (Convert.ToString(_oCabecera.Fields.Item("notificar").Value.ToString()) == "SI")
+                string sCantidadCorreos = null;
+                string sCorreo1 = null;
+                string sCorreo2 = null;
+                string sCorreo3 = null;
+                string sCorreo4 = null;
+                string sCorreo5 = null;
+
+
+                sCantidadCorreos = Convert.ToString(sRespuesta.historialDeEntregas.Length);
+
+                #endregion
+
+                #region Inserta el correo en la tablas de correos
+
+                #region Variables y objetos
+
+                string _sSerachNextCode = null;
+
+                SAPbobsCOM.Recordset oSerachNextCode = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
+                _sSerachNextCode = DllFunciones.GetStringXMLDocument(_oCompany, "BOeBillingService", "eBilling", "SerachNextCode");
+
+                oSerachNextCode.DoQuery(_sSerachNextCode);
+
+                #endregion
+
+                #region Asignacion de valores
+
+                SAPbobsCOM.UserTable oUserTable;
+
+                oUserTable = _oCompany.UserTables.Item("BOEE");
+                oUserTable.Code = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
+                oUserTable.Name = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
+                oUserTable.UserFields.Fields.Item("U_BO_DocEntry").Value = Convert.ToString(oDocs.Fields.Item("DocEntry").Value.ToString());
+                oUserTable.UserFields.Fields.Item("U_BO_ObjecType").Value = Convert.ToString(oDocs.Fields.Item("ObjType").Value.ToString());
+                oUserTable.UserFields.Fields.Item("U_BO_StatusEmail").Value = Convert.ToString(sRespuesta.historialDeEntregas[0].entregaEstatus.ToString());
+
+                #region Asignacion Correo 1
+
+                if (sCantidadCorreos == "1")
                 {
-                    #region Variables y objetos
+                    sCorreo1 = Convert.ToString(sRespuesta.historialDeEntregas[0].email.GetValue(0));
 
-                    SAPbobsCOM.Recordset oConsultaDoc = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-
-                    #endregion
-
-                    #region Consulta si ya se guardo el correo en la tablas de correos
-
-                    _sCountsEmails = _sCountsEmails.Replace("%DocEntry%", _sDocEntry).Replace("%ObjecType%", _sObjecType);
-
-                    oConsultaDoc.DoQuery(_sCountsEmails);
-
-                    #endregion
-
-                    if (oConsultaDoc.RecordCount > 0)
-                    {
-
-                    }
-                    else
-                    {
-                        #region Inserta el correo en la tablas de correos
-
-                        #region Variables y objetos
-
-                        string _sSerachNextCode;
-
-                        SAPbobsCOM.Recordset oSerachNextCode = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-
-                        _sSerachNextCode = DllFunciones.GetStringXMLDocument(_oCompany, "eBilling", "eBilling", "SerachNextCode");
-
-                        oSerachNextCode.DoQuery(_sSerachNextCode);
-
-                        #endregion
-
-                        #region Asignacion de valores
-
-                        SAPbobsCOM.UserTable oUserTable;
-
-                        oUserTable = _oCompany.UserTables.Item("BOEE");
-                        oUserTable.Code = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
-                        oUserTable.Name = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
-                        oUserTable.UserFields.Fields.Item("U_BO_DocEntry").Value = _sDocEntry;
-                        oUserTable.UserFields.Fields.Item("U_BO_ObjecType").Value = _sObjecType;
-
-                        #region Asignacion Correo 1
-
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(_oCabecera.Fields.Item("correoEntrega1").Value.ToString())))
-                        {
-
-                        }
-                        else
-                        {
-                            oUserTable.UserFields.Fields.Item("U_BO_Email1").Value = Convert.ToString(_oCabecera.Fields.Item("correoEntrega1").Value.ToString());
-                        }
-
-                        #endregion
-
-                        #region Asignacion Correo 2
-
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(_oCabecera.Fields.Item("correoEntrega2").Value.ToString())))
-                        {
-
-                        }
-                        else
-                        {
-                            oUserTable.UserFields.Fields.Item("U_BO_Email2").Value = Convert.ToString(_oCabecera.Fields.Item("correoEntrega2").Value.ToString());
-                        }
-
-                        #endregion
-
-                        #region Asignacion Correo 3
-
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(_oCabecera.Fields.Item("correoEntrega3").Value.ToString())))
-                        {
-
-                        }
-                        else
-                        {
-                            oUserTable.UserFields.Fields.Item("U_BO_Email3").Value = Convert.ToString(_oCabecera.Fields.Item("correoEntrega3").Value.ToString());
-                        }
-
-                        #endregion
-
-                        #region Asignacion Correo 4
-
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(_oCabecera.Fields.Item("correoEntrega4").Value.ToString())))
-                        {
-
-                        }
-                        else
-                        {
-                            oUserTable.UserFields.Fields.Item("U_BO_Email4").Value = Convert.ToString(_oCabecera.Fields.Item("correoEntrega4").Value.ToString());
-                        }
-
-                        #endregion
-
-                        #region Asignacion Correo 5
-
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(_oCabecera.Fields.Item("correoEntrega5").Value.ToString())))
-                        {
-
-                        }
-                        else
-                        {
-                            oUserTable.UserFields.Fields.Item("U_BO_Email5").Value = Convert.ToString(_oCabecera.Fields.Item("correoEntrega5").Value.ToString());
-                        }
-
-                        #endregion
-
-                        #endregion
-
-                        oUserTable.Add();
-
-                        #endregion
-
-                        DllFunciones.liberarObjetos(oSerachNextCode);
-
-                    }
-
-                    DllFunciones.liberarObjetos(oConsultaDoc);
-                    DllFunciones.liberarObjetos(_oCabecera);
+                    oUserTable.UserFields.Fields.Item("U_BO_Email1").Value = sCorreo1;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email2").Value = "";
+                    oUserTable.UserFields.Fields.Item("U_BO_Email3").Value = "";
+                    oUserTable.UserFields.Fields.Item("U_BO_Email4").Value = "";
+                    oUserTable.UserFields.Fields.Item("U_BO_Email5").Value = "";
+                   
                 }
+
+                #endregion
+
+                #region Asignacion Correo 2
+
+                if (sCantidadCorreos == "2")
+                {
+                    sCorreo1 = Convert.ToString(sRespuesta.historialDeEntregas[0].email.GetValue(0));
+                    sCorreo2 = Convert.ToString(sRespuesta.historialDeEntregas[1].email.GetValue(0));
+
+                    oUserTable.UserFields.Fields.Item("U_BO_Email1").Value = sCorreo1;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email2").Value = sCorreo2;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email3").Value = "";
+                    oUserTable.UserFields.Fields.Item("U_BO_Email4").Value = "";
+                    oUserTable.UserFields.Fields.Item("U_BO_Email5").Value = "";
+
+
+                }
+
+                #endregion
+
+                #region Asignacion Correo 3
+
+                if (sCantidadCorreos == "3")
+                {
+                    sCorreo1 = Convert.ToString(sRespuesta.historialDeEntregas[0].email.GetValue(0));
+                    sCorreo2 = Convert.ToString(sRespuesta.historialDeEntregas[1].email.GetValue(0));
+                    sCorreo3 = Convert.ToString(sRespuesta.historialDeEntregas[2].email.GetValue(0));
+
+                    oUserTable.UserFields.Fields.Item("U_BO_Email1").Value = sCorreo1;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email2").Value = sCorreo2;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email3").Value = sCorreo3;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email4").Value = "";
+                    oUserTable.UserFields.Fields.Item("U_BO_Email5").Value = "";
+
+
+                }
+
+                #endregion
+
+                #region Asignacion Correo 4
+
+                if (sCantidadCorreos == "4")
+                {
+                    sCorreo1 = Convert.ToString(sRespuesta.historialDeEntregas[0].email.GetValue(0));
+                    sCorreo2 = Convert.ToString(sRespuesta.historialDeEntregas[1].email.GetValue(0));
+                    sCorreo3 = Convert.ToString(sRespuesta.historialDeEntregas[2].email.GetValue(0));
+                    sCorreo4 = Convert.ToString(sRespuesta.historialDeEntregas[3].email.GetValue(0));
+
+                    oUserTable.UserFields.Fields.Item("U_BO_Email1").Value = sCorreo1;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email2").Value = sCorreo2;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email3").Value = sCorreo3;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email4").Value = sCorreo4;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email5").Value = "";
+
+                }
+
+                #endregion
+
+                #region Asignacion Correo 5
+
+                if (sCantidadCorreos == "5")
+                {
+                    sCorreo1 = Convert.ToString(sRespuesta.historialDeEntregas[0].email.GetValue(0));
+                    sCorreo2 = Convert.ToString(sRespuesta.historialDeEntregas[1].email.GetValue(0));
+                    sCorreo3 = Convert.ToString(sRespuesta.historialDeEntregas[2].email.GetValue(0));
+                    sCorreo4 = Convert.ToString(sRespuesta.historialDeEntregas[3].email.GetValue(0));
+                    sCorreo5 = Convert.ToString(sRespuesta.historialDeEntregas[4].email.GetValue(0));
+
+                    oUserTable.UserFields.Fields.Item("U_BO_Email1").Value = sCorreo1;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email2").Value = sCorreo2;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email3").Value = sCorreo3;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email4").Value = sCorreo4;
+                    oUserTable.UserFields.Fields.Item("U_BO_Email5").Value = sCorreo5;
+
+                }
+
+                #endregion
+                
+                #endregion
+
+                oUserTable.Add();
+
+                #endregion
+
+                #region Liberar Objetos
+
+                DllFunciones.liberarObjetos(oSerachNextCode);
+                DllFunciones.liberarObjetos(oUserTable);
+                sRespuesta = null;
+
+                #endregion
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                DllFunciones.Logger(ex.ToString(), sPathFileLog);
             }
 
 

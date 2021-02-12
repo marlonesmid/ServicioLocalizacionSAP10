@@ -15,7 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0658EE7F0DA242CD87F280E8DF5721F4"
+        "MsmKey" = "8:_001784386FF44B2AABEC1F565F77F888"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -767,9 +767,9 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0658EE7F0DA242CD87F280E8DF5721F4"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_001784386FF44B2AABEC1F565F77F888"
             {
-            "SourcePath" = "8:..\\BOeBillingService\\BOeBillingService\\Queries\\eBillingSQL.xml"
+            "SourcePath" = "8:..\\ServicioLocalizacion\\bin\\x86\\BOeBillingService\\Queries\\eBillingSQL.xml"
             "TargetName" = "8:eBillingSQL.xml"
             "Tag" = "8:"
             "Folder" = "8:_CD1CC10A8EFD4FB99B8593B535A07B17"
@@ -918,11 +918,6 @@
             "AssemblyAsmDisplayName" = "8:CrystalDecisions.CrystalReports.Engine, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_159A5C54AD0ED1BA1B86CFC2EC30B1D3"
-                    {
-                    "Name" = "8:CrystalDecisions.CrystalReports.Engine.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:CrystalDecisions.CrystalReports.Engine.dll"
             "TargetName" = "8:"
@@ -949,11 +944,6 @@
             "AssemblyAsmDisplayName" = "8:BOFunciones, Version=2.2.0.1, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_1D6719D1C1023BF028F3EC6C4E5BFA79"
-                    {
-                    "Name" = "8:BOFunciones.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:BOFunciones.dll"
             "TargetName" = "8:"
@@ -980,11 +970,6 @@
             "AssemblyAsmDisplayName" = "8:BOConnection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_3068AE0D6A284A5235F6C9EA7A597EBE"
-                    {
-                    "Name" = "8:BOConnection.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:BOConnection.dll"
             "TargetName" = "8:"
@@ -1042,11 +1027,6 @@
             "AssemblyAsmDisplayName" = "8:BOTCRMService, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_774D59A3A6E05BDA37A1C53914A64D7F"
-                    {
-                    "Name" = "8:BOTCRMService.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:BOTCRMService.dll"
             "TargetName" = "8:"
@@ -1073,11 +1053,6 @@
             "AssemblyAsmDisplayName" = "8:BOFunciones, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_7D89902A17A6E177F79EFACA090B6D81"
-                    {
-                    "Name" = "8:BOFunciones.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:BOFunciones.dll"
             "TargetName" = "8:"
@@ -1175,11 +1150,6 @@
             "AssemblyAsmDisplayName" = "8:BOeBillingService, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_9B31D3253B1CF92EAC6C4A080FEF964F"
-                    {
-                    "Name" = "8:BOeBillingService.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:BOeBillingService.dll"
             "TargetName" = "8:"
@@ -1268,11 +1238,6 @@
             "AssemblyAsmDisplayName" = "8:CrystalDecisions.Shared, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_A2909B7A5026AEE151923C436EAF8692"
-                    {
-                    "Name" = "8:CrystalDecisions.Shared.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:CrystalDecisions.Shared.dll"
             "TargetName" = "8:"
@@ -1361,11 +1326,6 @@
             "AssemblyAsmDisplayName" = "8:SAPBusinessOneSDK, Version=1.0.0.1, Culture=neutral, PublicKeyToken=c7c3cb60e45d119f, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_C407D37D4436275B6A20262EBE1416A9"
-                    {
-                    "Name" = "8:SAPBusinessOneSDK.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:SAPBusinessOneSDK.dll"
             "TargetName" = "8:"
@@ -1494,11 +1454,6 @@
             "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
                 "ScatterAssemblies"
                 {
-                    "_EA31B66A7CD18106E0BBA2DED73EF448"
-                    {
-                    "Name" = "8:System.Net.Http.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Net.Http.dll"
             "TargetName" = "8:"
@@ -1525,11 +1480,6 @@
             "AssemblyAsmDisplayName" = "8:stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
                 "ScatterAssemblies"
                 {
-                    "_EC27C64BDD84BD1EF54C555F9F9B179E"
-                    {
-                    "Name" = "8:stdole.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:stdole.dll"
             "TargetName" = "8:"
@@ -1609,7 +1559,7 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_D2C6A9CA0205415CAE96A7AB83F76949"
                     {
-                    "Name" = "8:Log"
+                    "Name" = "8:Logs"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -1691,23 +1641,23 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Servicio Localizacion Basis One"
-        "ProductCode" = "8:{3924FE39-1DD7-4B7F-AC33-7C30A005A9FF}"
-        "PackageCode" = "8:{47349FDE-4BFF-4DC5-8D56-81937980661D}"
+        "ProductCode" = "8:{5C0E90E5-4FC7-420D-A56A-8FA7BF7C8882}"
+        "PackageCode" = "8:{B34051E9-F411-40F1-AAC7-3FF344C53350}"
         "UpgradeCode" = "8:{E1DFF43E-127F-45B6-94A2-73A3926CFA44}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:10.2.0"
+        "ProductVersion" = "8:10.4.0"
         "Manufacturer" = "8:Basis One SAS"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Servicio Localizacion BasisOne V 10.0.12"
+        "Title" = "8:Servicio Localizacion BasisOne"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Basis One SAS"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Servicio complementario de la Localizacion Basis One SAS"
+        "ARPCOMMENTS" = "8:Servicio complementario de la Localizacion Basis One SAS y Facturacion Electronica"
         "ARPURLINFOABOUT" = "8:"
         "ARPPRODUCTICON" = "8:_9AB2CB8076D546B2A4FF0D627A8A69D5"
         "ARPIconIndex" = "3:0"
