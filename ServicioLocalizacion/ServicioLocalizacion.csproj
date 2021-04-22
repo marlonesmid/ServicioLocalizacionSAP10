@@ -48,6 +48,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\x86\BOFunciones.dll</HintPath>
     </Reference>
+    <Reference Include="BOJournalEntrys">
+      <HintPath>..\BOJournalEntrys\bin\x86\BOJournalEntrys.dll</HintPath>
+    </Reference>
     <Reference Include="BOTCRMService">
       <HintPath>..\BOTCRM\bin\x86\BOTCRMService.dll</HintPath>
     </Reference>

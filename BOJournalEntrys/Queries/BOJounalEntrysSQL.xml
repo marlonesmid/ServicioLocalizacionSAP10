@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Queries>
+  <GetJounalEntrysHead>
+    
+     SELECT DISTINCT A.TransId
+         
+     FROM JDT1 A LEFT JOIN OJDT B ON A.TransId=B.TransId 
+     WHERE A.RefDate BETWEEN '20210101' AND '20231231' AND U_BO_SocioNegocio IS NULL AND A.TransType IN('13','16','24','59','60','202')
+	   ORDER BY 1
+    
+  </GetJounalEntrysHead>
+
+  <GetJounalEntrysLines>
+    
+     SELECT A.TransId,
+	           A.Line_ID,
+	           A.Account,
+	           CASE WHEN A.TransType IN('202','60', '59') THEN (SELECT TOP 1 U_BO_Dflt_CardCode FROM [@BO_CONFIG]) 
+				          WHEN A.TransType IN('16') THEN (SELECT TOP 1 CardCode FROM ORDN WHERE TransId = A.TransId) 
+				          WHEN A.TransType IN('24') THEN (SELECT TOP 1 CardCode FROM ORCT WHERE TransId = A.TransId) 
+				          WHEN A.TransType IN('13') THEN (SELECT TOP 1 CardCode FROM OINV WHERE TransId = A.TransId) 
+		         ELSE U_BO_SocioNegocio END AS "U_BO_SocioNegocio", 
+		         A.TransType
+         
+     FROM JDT1 A LEFT JOIN OJDT B ON A.TransId=B.TransId 
+     WHERE A.RefDate BETWEEN '20210101' AND '20231231' AND U_BO_SocioNegocio IS NULL AND A.TransType IN('13','16','24','59','60','202')
+    
+  </GetJounalEntrysLines>
+  
+</Queries>

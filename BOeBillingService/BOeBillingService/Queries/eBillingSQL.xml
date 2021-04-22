@@ -113,17 +113,35 @@
 
   <GetEmailNotSend>
     
-    SELECT *
+    SELECT TOP 800 *
     FROM (
 
-		    SELECT T0.DocEntry, T0.DocNum, T0.ObjType, T1.U_BO_DocEntry, CONCAT(T2.U_BO_PREF,T0.DocNum) AS 'DocPref'
-		    FROM %Table% T0 LEFT JOIN [@BOEE] T1 ON T0.DocEntry=T1.U_BO_DocEntry AND T0.ObjType=T1.U_BO_ObjecType 
+		    SELECT T0.DocEntry, 
+				   T0.DocNum, 
+				   T0.ObjType,
+				   T1.U_BO_DocEntry,
+				   T1.Code,
+				   CONCAT(T2.U_BO_PREF,T0.DocNum) AS 'DocPref',
+				   T1.U_BO_StatusEmail,
+				   ISNULL(T1.U_BO_Count,0) AS 'Contador',
+				   T1.U_BO_PdfTfhka,
+				   T0.U_BO_RPDF,
+				   T3.U_BO_E_mail_1 AS 'correoEntrega1',
+				   T3.U_BO_E_mail_2 AS 'correoEntrega2',
+				   T3.U_BO_E_mail_3 AS 'correoEntrega3',
+				   T3.U_BO_E_mail_4 AS 'correoEntrega4',
+				   T3.U_BO_E_mail_5 AS 'correoEntrega5',
+				   CASE WHEN T0.U_BO_EE = 'N' THEN 'NO' ELSE 'SI' END AS 'notificar'
+
+           
+		    FROM OINV T0 LEFT JOIN [@BOEE] T1 ON T0.DocEntry=T1.Code AND T0.ObjType=T1.[Name] 
 					     LEFT JOIN [@BOSERNUM] T2 ON T0.Series=T2.U_BO_SN AND T2.U_BO_TD = 'FVC'
-		    WHERE T0.U_BO_CRWS = '200'  
+						 LEFT JOIN OCRD T3 ON T0.CardCode=T3.CardCode
+		    WHERE T0.U_BO_CRWS = '200' AND CAST(T1.U_BO_Count AS DECIMAL(19,6)) &gt; 6
 		
 	    ) B
 
-    WHERE B.U_BO_DocEntry IS NULL
+    WHERE B.U_BO_DocEntry IS NULL AND B.U_BO_StatusEmail != 200 
     
   </GetEmailNotSend>
 

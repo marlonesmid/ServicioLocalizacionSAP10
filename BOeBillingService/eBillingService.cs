@@ -416,7 +416,7 @@ namespace BOeBillingService
 
                     #region Si la linea del articulo es muestra, coloca el tag precio de referencia
 
-                    
+
                     if (Articulo.muestraGratis == "1")
                     {
                         Articulo.precioReferencia = Convert.ToString(oLineas.Fields.Item("precioReferencia").Value.ToString());
@@ -635,7 +635,7 @@ namespace BOeBillingService
             #endregion
 
             #region Informcion Adicional
-            
+
             if (Convert.ToString(oCabecera.Fields.Item("FacturaTieneMuestras").Value.ToString()) == "SI")
             {
                 string[] txtInformacionAdicional = new string[1];
@@ -1056,6 +1056,7 @@ namespace BOeBillingService
                                 oCUFEInvoice.DoQuery(sCUFEInvoice);
 
                             }
+
                             FacturaGeneral Documento = oBuillInvoice(oCabeceraDocumento, oLineasDocumento, oImpuestosGenerales, oImpuestosTotales, oCUFEInvoice, _TipoDocumento);
 
                             #endregion
@@ -1129,7 +1130,6 @@ namespace BOeBillingService
 
                                     if (sFormaEnvio == "11")
                                     {
-                                        //DllFunciones.StatusBar(_sboapp, BoStatusBarMessageType.smt_Success, "Paso 7: Generando PDF, por favor espere ...");
 
                                         FileInfo ValidacionPDF = new FileInfo(sRutaPDF);
 
@@ -1171,7 +1171,7 @@ namespace BOeBillingService
 
                                     sPrefijoConDoc = Convert.ToString(oCabeceraDocumento.Fields.Item("Prefijo").Value.ToString()) + sDocNumInvoice;
 
-                                    EnviarAdjuntosTFHKA(oCabeceraDocumento, sRutaPDF, sPrefijoConDoc, Convert.ToString(oParametrosTFHKA.Fields.Item("TokenEmpresa").Value.ToString()), Convert.ToString(oParametrosTFHKA.Fields.Item("TokenPassword").Value.ToString()), sPathFileLog);
+                                    EnviarAdjuntosTFHKA(_oCompany, oCabeceraDocumento, sRutaPDF, sPrefijoConDoc, Convert.ToString(oParametrosTFHKA.Fields.Item("TokenEmpresa").Value.ToString()), Convert.ToString(oParametrosTFHKA.Fields.Item("TokenPassword").Value.ToString()), sPathFileLog, "Normal");
 
                                     #endregion
 
@@ -1451,7 +1451,7 @@ namespace BOeBillingService
 
                                         #region Envia el PDF al proveedor tecnologico TFHKA
 
-                                        EnviarAdjuntosTFHKA(oCabeceraDocumento, sRutaPDF, sPrefijoConDoc, sLlave, sPassword, sPathFileLog);
+                                        EnviarAdjuntosTFHKA(_oCompany, oCabeceraDocumento, sRutaPDF, sPrefijoConDoc, sLlave, sPassword, sPathFileLog, "Normal");
 
                                         #endregion
 
@@ -1504,8 +1504,6 @@ namespace BOeBillingService
                                 #endregion
                             }
 
-
-
                             #endregion
                         }
                         else
@@ -1519,13 +1517,13 @@ namespace BOeBillingService
             catch (Exception ex)
             {
                 DllFunciones.Logger(" No se pudo enviar la " + _TipoDocumento + " con DocEntry" + sDocEntryInvoice, sPathFileLog);
-                DllFunciones.Logger(ex.Message.ToString(),sPathFileLog);
-                DllFunciones.Logger(ex.StackTrace.ToString(),sPathFileLog);
+                DllFunciones.Logger(ex.Message.ToString(), sPathFileLog);
+                DllFunciones.Logger(ex.StackTrace.ToString(), sPathFileLog);
 
             }
         }
 
-        public void EnviarAdjuntosTFHKA(SAPbobsCOM.Recordset oCabecera, string _RutaPDFyXML, string _sPrefijoConDoc, string _tbxTokenEmpresa, string _tbxTokenPassword, string sPathFileLog)
+        public void EnviarAdjuntosTFHKA(SAPbobsCOM.Company _oCompany, SAPbobsCOM.Recordset oCabecera, string _RutaPDFyXML, string _sPrefijoConDoc, string _tbxTokenEmpresa, string _tbxTokenPassword, string sPathFileLog, string _sMetodo)
         {
             Funciones.Comunes DllFunciones = new Funciones.Comunes();
 
@@ -1648,7 +1646,7 @@ namespace BOeBillingService
                     uploadAttachment.nombre = file.Name.Substring(0, file.Name.Length - 4);
                     uploadAttachment.formato = file.Extension.Substring(1);
                     uploadAttachment.tipo = "1";
-
+       
                     if (Convert.ToString(oCabecera.Fields.Item("notificar").Value.ToString()) == "NO")
                     {
                         uploadAttachment.enviar = "0";
@@ -1665,21 +1663,28 @@ namespace BOeBillingService
                         }
                     }
 
-
                     ServicioAdjuntosFE.UploadAttachmentResponse fileRespuesta = new ServicioAdjuntosFE.UploadAttachmentResponse();
                     fileRespuesta = serviceClientAdjuntos.CargarAdjuntos(_tbxTokenEmpresa, _tbxTokenPassword, uploadAttachment);
                     if (fileRespuesta.codigo == 200)
                     {
-
+                        if (_sMetodo == "Validacion")
+                        {
+                            InsertSendEmail(_oCompany, oCabecera, null, sPathFileLog, Convert.ToString(fileRespuesta.codigo));
+                        }
                     }
                     else
                     {
-                        DllFunciones.Logger("No se pudo actualizar la factura de venta - Respuesta 200", sPathFileLog);
+                        DllFunciones.Logger("No se pudo cargar el PDF: " + fileRespuesta.mensaje, sPathFileLog);
+
+                        if (_sMetodo == "Validacion")
+                        {
+                            InsertSendEmail(_oCompany, oCabecera, null, sPathFileLog, Convert.ToString(fileRespuesta.codigo));
+                        }
                     }
                 }
                 else
                 {
-                    // no debería entrar a este ciclo
+                    DllFunciones.Logger("No se pudo enviar el PDF, no existe el archivo para el documento " + _sPrefijoConDoc, sPathFileLog);
                 }
 
             }
@@ -1693,7 +1698,7 @@ namespace BOeBillingService
             try
             {
                 #region Consulta URL
-                
+
                 string sGetModo = null;
                 string sURLEmision = null;
                 string sURLAdjuntos = null;
@@ -1716,59 +1721,65 @@ namespace BOeBillingService
                 sPass = Convert.ToString(oConsultarGetModo.Fields.Item("Password").Value.ToString());
 
                 DllFunciones.liberarObjetos(oConsultarGetModo);
-                                    
+
                 #endregion
-                    
+
                 #region Instanciacion parametros TFHKA
 
-                    
                 //Especifica el puerto (HTTP o HTTPS)
-                    if (sModo == "PRU")
-                    {
-                        BasicHttpBinding port = new BasicHttpBinding();
-                    }
-                    else if (sModo == "PRO")
-                    {
-                        BasicHttpsBinding port = new BasicHttpsBinding();
-                    }
 
-                    port.MaxBufferPoolSize = Int32.MaxValue;
-                    port.MaxBufferSize = Int32.MaxValue;
-                    port.MaxReceivedMessageSize = Int32.MaxValue;
-                    port.ReaderQuotas.MaxStringContentLength = Int32.MaxValue;
-                    port.SendTimeout = TimeSpan.FromMinutes(2);
-                    port.ReceiveTimeout = TimeSpan.FromMinutes(2);
+                if (sModo == "PRU")
+                {
+                    BasicHttpBinding port = new BasicHttpBinding();
+                }
+                else if (sModo == "PRO")
+                {
+                    BasicHttpsBinding port = new BasicHttpsBinding();
 
-                    if (sModo == "PRO")
-                    {
-                        port.Security.Mode = BasicHttpSecurityMode.Transport;
-                    }
+                }
 
-                    //Especifica la dirección de conexion para Emision y Adjuntos 
-                    EndpointAddress endPointEmision = new EndpointAddress(sURLEmision); //URL DEMO EMISION
-                    EndpointAddress endPointAdjuntos = new EndpointAddress(sURLAdjuntos); //URL DEMO ADJUNTOS          
+                port.MaxBufferPoolSize = Int32.MaxValue;
+                port.MaxBufferSize = Int32.MaxValue;
+                port.MaxReceivedMessageSize = Int32.MaxValue;
+                port.ReaderQuotas.MaxStringContentLength = Int32.MaxValue;
+                port.SendTimeout = TimeSpan.FromMinutes(2);
+                port.ReceiveTimeout = TimeSpan.FromMinutes(2);
+
+                if (sModo == "PRO")
+                {
+                    port.Security.Mode = BasicHttpSecurityMode.Transport;
+                }
+
+                //Especifica la dirección de conexion para Emision y Adjuntos 
+                EndpointAddress endPointEmision = new EndpointAddress(sURLEmision); //URL DEMO EMISION
+                EndpointAddress endPointAdjuntos = new EndpointAddress(sURLAdjuntos); //URL DEMO ADJUNTOS    
+
+                serviceClient = new ServicioEmisionFE.ServiceClient(port, endPointEmision);
+                serviceClientAdjuntos = new ServicioAdjuntosFE.ServiceClient(port, endPointAdjuntos);
+
+                DocumentStatusResponse resp = new BOeBillingService.ServicioEmisionFE.DocumentStatusResponse();
 
                 #endregion
 
                 #region Variables y Objetos 
-                
+
                 SAPbobsCOM.Recordset oGetDocs = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                
+                SAPbobsCOM.Recordset oGetDocsPDF = (SAPbobsCOM.Recordset)_oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
+
                 string sGetDocs = DllFunciones.GetStringXMLDocument(_oCompany, "BOeBillingService", "eBilling", "GetEmailNotSend");
-                
-                sGetDocs = sGetDocs.Replace("%Table%","OINV");
-                
+
+                sGetDocs = sGetDocs.Replace("%Table%", "OINV");
+
                 oGetDocs.DoQuery(sGetDocs);
+
+                int iDocumentosaconsultar = oGetDocs.RecordCount;
 
                 #endregion
 
-                #region Lista documentos a consultar en el proveedor tecnologico  
-                
-                int iDocumentosaconsultar = oGetDocs.RecordCount;
+                #region Consulta si ya se enviaron los correos en Facturas de clientes
 
-                serviceClient = new ServicioEmisionFE.ServiceClient(port, endPointEmision);
-                DocumentStatusResponse resp = new BOeBillingService.ServicioEmisionFE.DocumentStatusResponse();
-                
+                DllFunciones.Logger("Sincronizando estado envio correos facturas de venta", sPathFileLog);
+
                 if (iDocumentosaconsultar > 0)
                 {
                     oGetDocs.MoveFirst();
@@ -1777,31 +1788,183 @@ namespace BOeBillingService
                     {
                         string sDocPrefijo = null;
                         sDocPrefijo = Convert.ToString(oGetDocs.Fields.Item("DocPref").Value.ToString());
-                      
-                        resp = serviceClient.EstadoDocumento(sllave, sPass, sDocPrefijo );
+
+                        resp = serviceClient.EstadoDocumento(sllave, sPass, sDocPrefijo);
 
                         if (resp.codigo == 200)
                         {
-                            InsertSendEmail(_oCompany, oGetDocs, resp, sPathFileLog);
-                            DllFunciones.Logger("Documento No."+sDocPrefijo+" sincronizado",sPathFileLog);
+                            InsertSendEmail(_oCompany, oGetDocs, resp, sPathFileLog, null);
+                            DllFunciones.Logger("Documento No." + sDocPrefijo + " sincronizado", sPathFileLog);
                         }
 
                         oGetDocs.MoveNext();
 
-                        } while (oGetDocs.EoF == false);
+                    } while (oGetDocs.EoF == false);
+
+                    DllFunciones.Logger("Sincronizacion finalizada de correos de facturas", sPathFileLog);
+                }
+                else
+                {
+                    DllFunciones.Logger("No se encontraron correos de facturas de venta a sincronizar", sPathFileLog);
+                }
+
+                #endregion
+
+                #region Enviar PDF Pendientes
+
+                DllFunciones.Logger("Sincronizando PDF pendientes Notas Credito ", sPathFileLog);
+
+                oGetDocsPDF.DoQuery(sGetDocs);
+
+                int iDocumentosaconsultarPDF = oGetDocsPDF.RecordCount;
+
+                if (iDocumentosaconsultarPDF > 0)
+                {
+                    oGetDocsPDF.MoveFirst();
+                    
+                    do
+                    {
+
+                        if (Convert.ToString(oGetDocsPDF.Fields.Item("U_BO_PdfTFHKA").Value.ToString()) != "200")
+                        {
+
+                            if (Convert.ToString(oGetDocsPDF.Fields.Item("U_BO_PdfTFHKA").Value.ToString()) != "107")
+                            {
+
+                                string sDocPrefijo = null;
+                                sDocPrefijo = Convert.ToString(oGetDocsPDF.Fields.Item("DocPref").Value.ToString());
+
+                                string sRutaPDF = null;
+                                sRutaPDF = Convert.ToString(oGetDocsPDF.Fields.Item("U_BO_RPDF").Value.ToString());
+
+                                FileInfo file = new FileInfo(sRutaPDF);
+
+                                if (file.Exists)
+                                {
+                                    EnviarAdjuntosTFHKA(_oCompany, oGetDocsPDF, sRutaPDF, sDocPrefijo, sllave, sPass, sPathFileLog, "Validacion");
+                                }
+                                else
+                                {
+                                    InsertSendEmail(_oCompany, oGetDocsPDF, null, sPathFileLog, "99");
+                                }
+
+                                oGetDocsPDF.MoveNext();
+
+                            }
+
+                        }
+
+                    } while (oGetDocsPDF.EoF == false);
+
+                }
+                else
+                {
+                    DllFunciones.Logger("No se encontraron PDF por pendientes por sincronizar ", sPathFileLog);
+                }
+
+                #endregion
+
+                #region Consulta si ya se enviaron los correos en notas credito de clientes
+
+                DllFunciones.Logger("Sincronizando estado envio correos notas credito", sPathFileLog);
+
+                sGetDocs = null;
+
+                sGetDocs = DllFunciones.GetStringXMLDocument(_oCompany, "BOeBillingService", "eBilling", "GetEmailNotSend");
+
+                sGetDocs = sGetDocs.Replace("%Table%", "ORIN").Replace("FVC","NCC");
+
+                oGetDocs.DoQuery(sGetDocs);
+
+                int iDocumentosaconsultarORIN = oGetDocs.RecordCount;
+
+                if (iDocumentosaconsultarORIN > 0)
+                {
+                    oGetDocs.MoveFirst();
+
+                    do
+                    {
+                        string sDocPrefijo = null;
+                        sDocPrefijo = Convert.ToString(oGetDocs.Fields.Item("DocPref").Value.ToString());
+
+                        resp = serviceClient.EstadoDocumento(sllave, sPass, sDocPrefijo);
+
+                        if (resp.codigo == 200)
+                        {
+                            InsertSendEmail(_oCompany, oGetDocs, resp, sPathFileLog, null);
+                            DllFunciones.Logger("Documento No." + sDocPrefijo + " sincronizado", sPathFileLog);
+                        }
+
+                        oGetDocs.MoveNext();
+
+                    } while (oGetDocs.EoF == false);
 
                     DllFunciones.Logger("Sincronizacion finalizada", sPathFileLog);
                 }
                 else
                 {
-                    DllFunciones.Logger("No se encontraron correos a sincronizar",sPathFileLog);
+                    DllFunciones.Logger("No se encontraron correos de notas credito a sincronizar", sPathFileLog);
                 }
+
+                #endregion
+
+                #region Enviar PDF Pendientes
+
+                DllFunciones.Logger("Sincronizando PDF pendientes", sPathFileLog);
+
+                oGetDocsPDF.DoQuery(sGetDocs);
+
+                int iDocumentosaconsultarPDFORIN = oGetDocsPDF.RecordCount;
+
+                if (iDocumentosaconsultarPDFORIN > 0)
+                {
+                    oGetDocsPDF.MoveFirst();
+
+                    do
+                    {
+
+                        if (Convert.ToString(oGetDocsPDF.Fields.Item("U_BO_PdfTFHKA").Value.ToString()) != "200")
+                        {
+
+                            if (Convert.ToString(oGetDocsPDF.Fields.Item("U_BO_PdfTFHKA").Value.ToString()) != "107")
+                            {
+
+                                string sDocPrefijo = null;
+                                sDocPrefijo = Convert.ToString(oGetDocsPDF.Fields.Item("DocPref").Value.ToString());
+
+                                string sRutaPDF = null;
+                                sRutaPDF = Convert.ToString(oGetDocsPDF.Fields.Item("U_BO_RPDF").Value.ToString());
+
+                                FileInfo file = new FileInfo(sRutaPDF);
+
+                                if (file.Exists)
+                                {
+                                    EnviarAdjuntosTFHKA(_oCompany, oGetDocsPDF, sRutaPDF, sDocPrefijo, sllave, sPass, sPathFileLog, "Validacion");
+                                }
+                                else
+                                {
+                                    InsertSendEmail(_oCompany, oGetDocsPDF, null, sPathFileLog, "99");
+                                }
+
+                                oGetDocsPDF.MoveNext();
+
+                            }
+
+                        }
+
+                    } while (oGetDocsPDF.EoF == false);
+
+                }
+                else
+                {
+                    DllFunciones.Logger("No se encontraron PDF por pendientes por sincronizar ", sPathFileLog);
+                }
+
+                #endregion
 
                 #region Liberacion de Objetos
 
                 DllFunciones.liberarObjetos(oGetDocs);
-
-                #endregion
 
                 #endregion
 
@@ -2129,24 +2292,44 @@ namespace BOeBillingService
                 string sQryCreditMemo = null;
                 string sQryDebitMemo = null;
                 string sQrySeriesNumber = null;
+                string _sMotorDB = null;
 
                 SAPbobsCOM.Recordset oRsSeriesNumber = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 SAPbobsCOM.Recordset oRsInvoice = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 SAPbobsCOM.Recordset oRsCreditMemo = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 SAPbobsCOM.Recordset oRsDebitMemo = (SAPbobsCOM.Recordset)oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
 
+                _sMotorDB = Convert.ToString(oCompany.DbServerType);
+
                 sQrySeriesNumber = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetSeriesNumberActive");
 
                 oRsSeriesNumber.DoQuery(sQrySeriesNumber);
 
-                sQryInvoice = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetInvoices");
-                sQryInvoice = sQryInvoice.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND ISNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(0).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
+                if (_sMotorDB == "dst_HANADB")
+                {
+                    sQryInvoice = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetInvoices");
+                    sQryInvoice = sQryInvoice.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND IFNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(0).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
 
-                sQryCreditMemo = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetCreditMemo");
-                sQryCreditMemo = sQryCreditMemo.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND ISNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(1).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
+                    sQryCreditMemo = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetCreditMemo");
+                    sQryCreditMemo = sQryCreditMemo.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND IFNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(1).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
 
-                sQryDebitMemo = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetDebitMemo");
-                sQryDebitMemo = sQryDebitMemo.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND ISNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(2).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
+                    sQryDebitMemo = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetDebitMemo");
+                    sQryDebitMemo = sQryDebitMemo.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND IFNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(2).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
+
+                }
+                else
+                {
+                    sQryInvoice = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetInvoices");
+                    sQryInvoice = sQryInvoice.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND ISNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(0).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
+
+                    sQryCreditMemo = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetCreditMemo");
+                    sQryCreditMemo = sQryCreditMemo.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND ISNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(1).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
+
+                    sQryDebitMemo = DllFunciones.GetStringXMLDocument(oCompany, "BOeBillingService", "eBilling", "GetDebitMemo");
+                    sQryDebitMemo = sQryDebitMemo.Replace("%FI%", "20200101").Replace("%FF%", "20251231").Replace("%EstadoDocumento%", "AND ISNULL(\"U_BO_CRWS\",'') != ('200')").Replace("%Series%", Convert.ToString(oRsSeriesNumber.Fields.Item(2).Value)).Replace("***SN***", " ").Replace("***DocNum***", " ");
+
+                }
+
 
                 oRsInvoice.DoQuery(sQryInvoice);
                 oRsCreditMemo.DoQuery(sQryCreditMemo);
@@ -2171,8 +2354,6 @@ namespace BOeBillingService
                             sDocEntry = null;
                             sDocEntry = Convert.ToString(oRsInvoice.Fields.Item("DocEntry").Value.ToString());
                             EnviarDocumentosMasivamenteTFHKA(oCompany, "FacturaDeClientes", "S", sDocEntry, sPathFileLog);
-
-                            
 
                             oRsInvoice.MoveNext();
 
@@ -2231,7 +2412,7 @@ namespace BOeBillingService
 
         }
 
-        public void InsertSendEmail(SAPbobsCOM.Company _oCompany, SAPbobsCOM.Recordset oDocs, BOeBillingService.ServicioEmisionFE.DocumentStatusResponse sRespuesta, string sPathFileLog)
+        public void InsertSendEmail(SAPbobsCOM.Company _oCompany, SAPbobsCOM.Recordset oDocs, BOeBillingService.ServicioEmisionFE.DocumentStatusResponse sRespuesta, string sPathFileLog, string _EstadoPDF)
         {
             Funciones.Comunes DllFunciones = new Funciones.Comunes();
             try
@@ -2244,9 +2425,20 @@ namespace BOeBillingService
                 string sCorreo3 = null;
                 string sCorreo4 = null;
                 string sCorreo5 = null;
+                int iContador = 0;
 
+                if (sRespuesta == null)
+                {
+                    sCantidadCorreos = "0";
+                }
+                else
+                {
+                    sCantidadCorreos = Convert.ToString(sRespuesta.historialDeEntregas.Length);
+                }
 
-                sCantidadCorreos = Convert.ToString(sRespuesta.historialDeEntregas.Length);
+                iContador = Convert.ToInt32(oDocs.Fields.Item("Contador").Value.ToString());
+
+                iContador++;
 
                 #endregion
 
@@ -2267,13 +2459,48 @@ namespace BOeBillingService
                 #region Asignacion de valores
 
                 SAPbobsCOM.UserTable oUserTable;
-
                 oUserTable = _oCompany.UserTables.Item("BOEE");
-                oUserTable.Code = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
-                oUserTable.Name = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
-                oUserTable.UserFields.Fields.Item("U_BO_DocEntry").Value = Convert.ToString(oDocs.Fields.Item("DocEntry").Value.ToString());
-                oUserTable.UserFields.Fields.Item("U_BO_ObjecType").Value = Convert.ToString(oDocs.Fields.Item("ObjType").Value.ToString());
-                oUserTable.UserFields.Fields.Item("U_BO_StatusEmail").Value = Convert.ToString(sRespuesta.historialDeEntregas[0].entregaEstatus.ToString());
+
+                if (string.IsNullOrEmpty(Convert.ToString(oDocs.Fields.Item("Code").Value.ToString())))
+                {
+                    oUserTable.Code = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
+                    oUserTable.Name = Convert.ToString(oSerachNextCode.Fields.Item("ID").Value.ToString());
+                    oUserTable.UserFields.Fields.Item("U_BO_DocEntry").Value = Convert.ToString(oDocs.Fields.Item("DocEntry").Value.ToString());
+                    oUserTable.UserFields.Fields.Item("U_BO_ObjecType").Value = Convert.ToString(oDocs.Fields.Item("ObjType").Value.ToString());
+
+                }
+                else
+                {
+                    oUserTable.GetByKey(Convert.ToString(oDocs.Fields.Item("Code").Value.ToString()));
+                }
+
+                if (sRespuesta == null)
+                {
+
+                }
+                else
+                {
+                    if (sCantidadCorreos == "0")
+                    {
+
+                    }
+                    else
+                    {
+                        oUserTable.UserFields.Fields.Item("U_BO_StatusEmail").Value = Convert.ToString(sRespuesta.historialDeEntregas[0].entregaEstatus.ToString());
+                    }
+
+                    oUserTable.UserFields.Fields.Item("U_BO_Count").Value = Convert.ToString(iContador);
+                }
+
+                if (_EstadoPDF == null)
+                {
+
+                }
+                else
+                {
+                    oUserTable.UserFields.Fields.Item("U_BO_PdfTfhka").Value = _EstadoPDF;
+                }
+
 
                 #region Asignacion Correo 1
 
@@ -2286,7 +2513,7 @@ namespace BOeBillingService
                     oUserTable.UserFields.Fields.Item("U_BO_Email3").Value = "";
                     oUserTable.UserFields.Fields.Item("U_BO_Email4").Value = "";
                     oUserTable.UserFields.Fields.Item("U_BO_Email5").Value = "";
-                   
+
                 }
 
                 #endregion
@@ -2366,10 +2593,17 @@ namespace BOeBillingService
                 }
 
                 #endregion
-                
-                #endregion
 
-                oUserTable.Add();
+                if (string.IsNullOrEmpty(Convert.ToString(oDocs.Fields.Item("Code").Value.ToString())))
+                {
+                    oUserTable.Add();
+                }
+                else
+                {
+                    oUserTable.Update();
+                }
+
+                #endregion
 
                 #endregion
 
@@ -2387,8 +2621,7 @@ namespace BOeBillingService
 
                 DllFunciones.Logger(ex.ToString(), sPathFileLog);
             }
-
-
         }
+
     }
 }

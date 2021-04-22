@@ -9,6 +9,7 @@ using BOConnection;
 using BOeBillingService;
 using BOTCRM;
 using Funciones;
+using BOJournalEntrys;
 using SAPbobsCOM;
 
 namespace ServicioLocalizacion
@@ -21,7 +22,8 @@ namespace ServicioLocalizacion
         BOeBillingService.eBillingService DlleBillingService = new BOeBillingService.eBillingService();
         Funciones.Comunes DllFunciones = new Funciones.Comunes();
         BOTCRM.TCRM DllTcrm = new BOTCRM.TCRM();
-        
+        BOJournalEntrys.JournalEntrys DllJournalEntrys = new BOJournalEntrys.JournalEntrys();
+
         #endregion
 
         public void DllsMetodos(object sender, EventArgs e)
@@ -51,7 +53,7 @@ namespace ServicioLocalizacion
 
                 string PathFileLog = xmlQuerys.SelectSingleNode("Configuration/PathLog/PathFile").InnerText;
 
-                PathFileLog = PathFileLog + "\\"+ sNombreArchivoLog   ;
+                PathFileLog = PathFileLog + "\\" + sNombreArchivoLog;
 
                 #endregion
 
@@ -101,6 +103,9 @@ namespace ServicioLocalizacion
                 string seBillingService = xmlQuerys.SelectSingleNode("Configuration/Funcionalidades/eBillingService").InnerText;
                 seBillingService = seBillingService.Trim();
 
+                string sBOJounalEntrys = xmlQuerys.SelectSingleNode("Configuration/Funcionalidades/ActualizaTercero").InnerText;
+                sBOJounalEntrys = sBOJounalEntrys.Trim();
+
                 #endregion
 
                 #region Funciondalidad TRM - tasa representativa del mercado
@@ -109,8 +114,8 @@ namespace ServicioLocalizacion
                 {
                     #region Valida si es hora de ejecutar el servicio
 
-                    bool bEjecutarTRM = true; 
-                     
+                    bool bEjecutarTRM = true;
+
                     string sHoraEjecucion = xmlQuerys.SelectSingleNode("Configuration/Funcionalidades/TRCM/HoraActualizacion").InnerText;
                     var vHoraEjecucion = sHoraEjecucion.Trim();
 
@@ -195,7 +200,48 @@ namespace ServicioLocalizacion
                         #endregion
                     }
                 }
-                    
+
+                #endregion
+
+                #region Servicio actualizacion asientos contables
+
+                if (sBOJounalEntrys == "SI")
+                {
+                    for (int i = 0; i < CountDataBases; i++)
+                    {
+                        #region Establece conexion a SAP Business One
+
+                        oCompany = (SAPbobsCOM.Company)DllConnection.SetApplication(DataBases[i]);
+
+                        #endregion
+
+                        #region Ejecuta servicio 
+
+                        DllFunciones.Logger("Servicio de actualizacion asientos contables activo ", PathFileLog);
+
+                        if (oCompany.Connected == true)
+                        {
+                            DllFunciones.Logger("Buscando asientos contables a actualizar ", PathFileLog);
+                            DllJournalEntrys.ActualizarTercero(oCompany, PathFileLog);
+
+                            oCompany.Disconnect();
+
+                            DllFunciones.Logger("Proceso de actualizacion de asientos contables finalizado", PathFileLog);
+
+                            DllFunciones.Logger("Desconectado correctamente de la base de datos: " + DataBases[i], PathFileLog);
+
+                        }
+                        else
+                        {
+
+                            DllFunciones.Logger(" No esta conectado a SAP Business One, por lo cual no se ejecutara el servicio terceros ", PathFileLog);
+
+                        }
+
+                        #endregion
+                    }
+                }
+
                 #endregion
 
             }
@@ -227,7 +273,6 @@ namespace ServicioLocalizacion
 
 
         }
-
 
     }
 }

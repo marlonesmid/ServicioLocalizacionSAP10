@@ -39,7 +39,7 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "Servicio complementario de la Localizacion Basis One SAS";
+            this.serviceInstaller1.Description = "Servicio complementario de la Localizacion Basis One y Facturacion Electronica";
             this.serviceInstaller1.DisplayName = "Servicio Localizacion Basis One";
             this.serviceInstaller1.ServiceName = "Servicio Localizacion Basis One";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;

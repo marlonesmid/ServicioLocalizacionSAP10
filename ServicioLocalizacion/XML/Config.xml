@@ -51,6 +51,10 @@
     <eBillingService>
       SI
     </eBillingService>
+        <!-- Buscar asientos sin terceros para actualizarlos - SI/NO -->
+    <ActualizaTercero>
+      SI
+    </ActualizaTercero>
     
   </Funcionalidades>
 
